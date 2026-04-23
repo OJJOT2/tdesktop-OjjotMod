@@ -25,6 +25,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/color_int_conversion.h"
 #include "export/export_manager.h"
 #include "export/view/export_view_panel_controller.h"
+#include "detox/detox_important_filter.h"
 #include "mtproto/mtproto_config.h"
 #include "window/notifications_manager.h"
 #include "history/history.h"
@@ -3138,12 +3139,27 @@ HistoryItem *Session::addNewMessage(
 	return result;
 }
 
+Dialogs::UnreadState computedUnreadState(const Session &session) {
+	if (Core::App().settings().detoxModeEnabled() && Core::App().settings().detoxCounterImportantOnly()) {
+		auto effectiveState = Dialogs::UnreadState();
+		auto filter = Detox::ImportantFilter(const_cast<Main::Session*>(&session.session()));
+		for (const auto &peerId : filter.list()) {
+			if (const auto history = session.historyLoaded(peerId)) {
+				// Also include mentions etc
+				effectiveState += history->chatListUnreadState();
+			}
+		}
+		return effectiveState;
+	}
+	return session.chatsList().unreadState();
+}
+
 int Session::unreadBadge() const {
-	return computeUnreadBadge(_chatsList.unreadState());
+	return computeUnreadBadge(computedUnreadState(*this));
 }
 
 int Session::unreadWithMentionsBadge() const {
-	auto state = _chatsList.unreadState();
+	auto state = computedUnreadState(*this);
 	if (state.mentions) {
 		state.messages -= state.mentions;
 	}
@@ -3151,11 +3167,11 @@ int Session::unreadWithMentionsBadge() const {
 }
 
 bool Session::unreadBadgeMuted() const {
-	return computeUnreadBadgeMuted(_chatsList.unreadState());
+	return computeUnreadBadgeMuted(computedUnreadState(*this));
 }
 
 bool Session::unreadWithMentionsBadgeMuted() const {
-	const auto state = _chatsList.unreadState();
+	const auto state = computedUnreadState(*this);
 	return !state.mentions && computeUnreadBadgeMuted(state);
 }
 
@@ -3163,7 +3179,16 @@ int Session::unreadBadgeIgnoreOne(Dialogs::Key key) const {
 	const auto remove = (key && key.entry()->inChatList())
 		? key.entry()->chatListUnreadState()
 		: Dialogs::UnreadState();
-	return computeUnreadBadge(_chatsList.unreadState() - remove);
+	auto state = computedUnreadState(*this);
+	if (Core::App().settings().detoxModeEnabled() && Core::App().settings().detoxCounterImportantOnly()) {
+		auto filter = Detox::ImportantFilter(const_cast<Main::Session*>(&_session));
+		if (key && key.peer() && filter.isImportant(key.peer()->id)) {
+			state -= remove;
+		}
+	} else {
+		state -= remove;
+	}
+	return computeUnreadBadge(state);
 }
 
 bool Session::unreadBadgeMutedIgnoreOne(Dialogs::Key key) const {
@@ -3173,11 +3198,20 @@ bool Session::unreadBadgeMutedIgnoreOne(Dialogs::Key key) const {
 	const auto remove = (key && key.entry()->inChatList())
 		? key.entry()->chatListUnreadState()
 		: Dialogs::UnreadState();
-	return computeUnreadBadgeMuted(_chatsList.unreadState() - remove);
+	auto state = computedUnreadState(*this);
+	if (Core::App().settings().detoxModeEnabled() && Core::App().settings().detoxCounterImportantOnly()) {
+		auto filter = Detox::ImportantFilter(const_cast<Main::Session*>(&_session));
+		if (key && key.peer() && filter.isImportant(key.peer()->id)) {
+			state -= remove;
+		}
+	} else {
+		state -= remove;
+	}
+	return computeUnreadBadgeMuted(state);
 }
 
 int Session::unreadOnlyMutedBadge() const {
-	const auto state = _chatsList.unreadState();
+	const auto state = computedUnreadState(*this);
 	return Core::App().settings().countUnreadMessages()
 		? state.messagesMuted
 		: state.chatsMuted;

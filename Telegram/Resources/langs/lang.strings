@@ -7958,4 +7958,23 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_sr_languages_column_native" = "Native name";
 "lng_sr_languages_column_name" = "Language name";
 
+"lng_detox_mark_important" = "Mark as Important";
+"lng_detox_unmark_important" = "Unmark as Important";
+"lng_detox_mode" = "Detox Mode";
+"lng_detox_mode_about" = "Reduce distractions by filtering notifications and counting only important chats.";
+"lng_detox_counter_mode" = "Notification Counter Mode";
+"lng_detox_counter_all" = "Show all unread messages";
+"lng_detox_counter_important" = "Show only important chats";
+"lng_detox_screen_title" = "What do you really need?";
+"lng_detox_check_updates" = "Check for Updates";
+"lng_detox_check_updates_about" = "View unread messages from important chats";
+"lng_detox_pick_file" = "I need to pick a file";
+"lng_detox_pick_file_about" = "Browse files only, no messaging";
+"lng_detox_reply" = "I need to reply to people";
+"lng_detox_reply_about" = "Full chat with a time limit";
+"lng_detox_confirm" = "Do you really need to do this?";
+"lng_detox_timer_label" = "Time limit (minutes)";
+"lng_detox_time_remaining" = "Time remaining: {time}";
+"lng_detox_exit" = "Exit Detox Mode";
+
 // Keys finished

@@ -526,6 +526,8 @@ PRIVATE
     core/core_cloud_password.h
     core/core_settings.cpp
     core/core_settings.h
+    detox/detox_important_filter.cpp
+    detox/detox_important_filter.h
     core/core_settings_proxy.cpp
     core/core_settings_proxy.h
     core/crash_report_window.cpp
@@ -1666,6 +1668,8 @@ PRIVATE
     settings/settings_intro.h
     settings/sections/settings_local_passcode.cpp
     settings/sections/settings_local_passcode.h
+    settings/sections/settings_detox.cpp
+    settings/sections/settings_detox.h
     settings/sections/settings_main.cpp
     settings/sections/settings_main.h
     settings/settings_recent_searches.cpp

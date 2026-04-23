@@ -1024,6 +1024,20 @@ public:
 	void setNotificationsVolume(ushort value) {
 		_notificationsVolume = value;
 	}
+	[[nodiscard]] bool detoxModeEnabled() const {
+		return const_cast<Settings*>(this)->readPref<bool>(
+			"detox-mode-enabled");
+	}
+	void setDetoxModeEnabled(bool value) {
+		writePref<bool>("detox-mode-enabled", value);
+	}
+	[[nodiscard]] bool detoxCounterImportantOnly() const {
+		return const_cast<Settings*>(this)->readPref<bool>(
+			"detox-counter-important-only");
+	}
+	void setDetoxCounterImportantOnly(bool value) {
+		writePref<bool>("detox-counter-important-only", value);
+	}
 
 	template <typename Type, typename Other>
 	void writePref(std::string_view key, Other &&value) {

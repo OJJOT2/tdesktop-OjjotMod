@@ -12,6 +12,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/qt/qt_key_modifiers.h"
 #include "platform/platform_notifications_manager.h"
 #include "window/notifications_manager_default.h"
+#include "detox/detox_important_filter.h"
 #include "media/audio/media_audio_track.h"
 #include "media/audio/media_audio.h"
 #include "mtproto/mtproto_config.h"
@@ -333,6 +334,12 @@ System::SkipState System::computeSkipState(
 	const auto notifyBy = messageType
 		? item->specialNotificationPeer()
 		: notification.reactionOrVoteSender;
+	if (Core::App().settings().detoxModeEnabled()) {
+		auto filter = Detox::ImportantFilter(const_cast<Main::Session*>(&thread->session()));
+		if (!filter.isImportant(thread->peer()->id)) {
+			return { SkipState::Skip };
+		}
+	}
 	if (Core::Quitting()) {
 		return { SkipState::Skip };
 	} else if (!Core::App().settings().notifyFromAll()

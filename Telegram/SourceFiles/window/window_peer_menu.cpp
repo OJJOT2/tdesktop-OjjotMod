@@ -85,6 +85,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "settings/settings_common.h"
 #include "support/support_helper.h"
 #include "info/info_controller.h"
+#include "detox/detox_important_filter.h"
 #include "info/info_memento.h"
 #include "info/channel_statistics/boosts/info_boosts_widget.h"
 #include "info/channel_statistics/earn/info_channel_earn_widget.h"
@@ -337,6 +338,7 @@ private:
 	void addBoostChat();
 	void addToggleFee();
 	void addSetPersonalChannel();
+	void addToggleImportant();
 
 	[[nodiscard]] bool skipCreateActions() const;
 
@@ -1733,6 +1735,26 @@ void Filler::addVideoChat() {
 	});
 }
 
+void Filler::addToggleImportant() {
+	if (!_peer) {
+		return;
+	}
+	const auto peerId = _peer->id;
+	const auto controller = _controller;
+	const auto session = &_peer->session();
+	const auto filter = session->lifetime().make_state<Detox::ImportantFilter>(
+		session);
+	const auto isImportant = filter->isImportant(peerId);
+	const auto text = isImportant
+		? tr::lng_detox_unmark_important(tr::now)
+		: tr::lng_detox_mark_important(tr::now);
+	_addAction(text, [=] {
+		auto toggle = Detox::ImportantFilter(session);
+		toggle.toggle(peerId);
+		Core::App().domain().notifyUnreadBadgeChanged();
+	}, &st::menuIconFave);
+}
+
 void Filler::fillContextMenuActions() {
 	addNewWindow();
 	addHidePromotion();
@@ -1745,6 +1767,7 @@ void Filler::fillContextMenuActions() {
 	addToggleUnreadMark();
 	addToggleTopicClosed();
 	addToggleFolder();
+	addToggleImportant();
 	if (const auto user = _peer->asUser()) {
 		if (!user->isContact()) {
 			addBlockUser();

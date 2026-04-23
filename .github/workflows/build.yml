@@ -1,0 +1,33 @@
+name: Cloud Build
+on: [push, workflow_dispatch]
+
+jobs:
+  build_windows:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Run Telegram Prepare
+        run: |
+          .\Telegram\build\prepare\win.bat
+
+      - name: Configure and Build
+        env:
+          MY_API_ID: ${{ secrets.TDESKTOP_API_ID }}
+          MY_API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
+        run: |
+          # We pass the secrets directly into the configure script
+          .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH
+          cmake --build out --config Release --target Telegram
+          
+      - name: Upload Finished App
+        uses: actions/upload-artifact@v4
+        with:
+          name: OjjotMod-Binary
+          path: out/Release/Telegram.exe
