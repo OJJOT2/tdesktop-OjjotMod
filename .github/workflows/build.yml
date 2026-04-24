@@ -1,5 +1,8 @@
 name: Cloud Build
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: [ dev ]
+  workflow_dispatch:
 
 jobs:
   build_windows:
@@ -25,7 +28,7 @@ jobs:
           # We pass the secrets directly into the configure script
           .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH
           cmake --build out --config Release --target Telegram
-          
+
       - name: Upload Finished App
         uses: actions/upload-artifact@v4
         with:
