@@ -16,6 +16,15 @@ jobs:
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Cache Third-Party Libraries
+        uses: actions/cache@v4
+        with:
+          path: |
+            Libraries
+            ThirdParty
+          # This key changes if the prepare scripts change, forcing a rebuild. Otherwise, it loads the saved files.
+          key: ${{ runner.os }}-tdesktop-libs-${{ hashFiles('Telegram/build/prepare/**') }}
+
       - name: Run Telegram Prepare
         run: |
           .\Telegram\build\prepare\win.bat
