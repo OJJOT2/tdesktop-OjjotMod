@@ -22,20 +22,21 @@ jobs:
           path: |
             Libraries
             ThirdParty
-          # This key changes if the prepare scripts change, forcing a rebuild. Otherwise, it loads the saved files.
-          key: ${{ runner.os }}-tdesktop-libs-${{ hashFiles('Telegram/build/prepare/**') }}
+          # I updated the key here to "qt6" so it ignores the broken files from the last run
+          key: ${{ runner.os }}-tdesktop-qt6-libs-${{ hashFiles('Telegram/build/prepare/**') }}
 
       - name: Run Telegram Prepare
         run: |
-          .\Telegram\build\prepare\win.bat
+          # Added the 'qt6' flag here
+          .\Telegram\build\prepare\win.bat qt6
 
       - name: Configure and Build
         env:
           MY_API_ID: ${{ secrets.TDESKTOP_API_ID }}
           MY_API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
         run: |
-          # We pass the secrets directly into the configure script
-          .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH
+          # Added the DESKTOP_APP_QT6=ON flag here along with your API keys
+          .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH -D DESKTOP_APP_QT6=ON
           cmake --build out --config Release --target Telegram
 
       - name: Upload Finished App
