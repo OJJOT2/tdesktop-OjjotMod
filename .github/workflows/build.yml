@@ -30,7 +30,7 @@ jobs:
           cmake --build out --config Release --target Telegram
 
       - name: Upload Finished App
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: OjjotMod-Binary
           path: out/Release/Telegram.exe
