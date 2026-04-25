@@ -38,6 +38,7 @@ jobs:
         env:
           MY_API_ID: ${{ secrets.TDESKTOP_API_ID }}
           MY_API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
+          DESKTOP_APP_QT6: 1
         run: |
           .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH
           cmake --build out --config Release --target Telegram
