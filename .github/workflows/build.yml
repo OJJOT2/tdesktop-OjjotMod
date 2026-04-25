@@ -4,6 +4,10 @@ on:
     branches: [ dev ]
   workflow_dispatch:
 
+# THIS is the correct way to force Qt 6 across the entire build
+env:
+  DESKTOP_APP_QT6: 1
+
 jobs:
   build_windows:
     runs-on: windows-2022
@@ -22,21 +26,20 @@ jobs:
           path: |
             Libraries
             ThirdParty
-          # I updated the key here to "qt6" so it ignores the broken files from the last run
-          key: ${{ runner.os }}-tdesktop-qt6-libs-${{ hashFiles('Telegram/build/prepare/**') }}
+          # Updated to "v2" so it ignores the broken architecture folder we just made
+          key: ${{ runner.os }}-tdesktop-qt6-v2-libs-${{ hashFiles('Telegram/build/prepare/**') }}
 
       - name: Run Telegram Prepare
         run: |
-          # Added the 'qt6' flag here
-          .\Telegram\build\prepare\win.bat qt6
+          # Back to normal. The environment variable above tells it to use Qt 6.
+          .\Telegram\build\prepare\win.bat
 
       - name: Configure and Build
         env:
           MY_API_ID: ${{ secrets.TDESKTOP_API_ID }}
           MY_API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
         run: |
-          # Added the DESKTOP_APP_QT6=ON flag here along with your API keys
-          .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH -D DESKTOP_APP_QT6=ON
+          .\Telegram\configure.bat x64 -D TDESKTOP_API_ID=$env:MY_API_ID -D TDESKTOP_API_HASH=$env:MY_API_HASH
           cmake --build out --config Release --target Telegram
 
       - name: Upload Finished App
