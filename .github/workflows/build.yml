@@ -21,6 +21,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Cache Third-Party Libraries
+        id: cache-libs
         uses: actions/cache@v4
         with:
           path: |
@@ -30,6 +31,7 @@ jobs:
           key: ${{ runner.os }}-tdesktop-qt6-v2-libs-${{ hashFiles('Telegram/build/prepare/**') }}
 
       - name: Run Telegram Prepare
+        if: steps.cache-libs.outputs.cache-hit != 'true'
         run: |
           # Back to normal. The environment variable above tells it to use Qt 6.
           .\Telegram\build\prepare\win.bat
