@@ -22,7 +22,7 @@ jobs:
 
       - name: Cache Third-Party Libraries
         id: cache-libs
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             Libraries
